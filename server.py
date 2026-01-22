@@ -5,9 +5,18 @@ import json
 import time
 import os
 import sys
+import subprocess
 
 # Load environment variables from .env file
 load_dotenv()
+
+# Install Playwright browsers at startup (for Render deployment)
+print("🔧 Installing Playwright browsers...")
+try:
+    subprocess.run([sys.executable, "-m", "playwright", "install", "chromium"], check=True)
+    print("✅ Playwright browsers installed!")
+except Exception as e:
+    print(f"⚠️ Playwright install warning: {e}")
 
 # Get the directory where this script is located
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
