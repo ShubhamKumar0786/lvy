@@ -88,7 +88,7 @@ def process_vins():
             # Initialize automation
             yield f"data: {json.dumps({'type': 'log', 'message': '🌐 Starting browser...', 'level': 'info'})}\n\n"
             
-            headless = config.get('headless', False)
+            headless = True  # Always headless on server
             automation = SignalVinAutomation(headless=headless)
             automation.start()
             
