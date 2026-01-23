@@ -96,6 +96,18 @@ def process_vins():
             login_success = False
             attempt = 0
             
+            # Get credentials from environment
+            signal_email = os.getenv('SIGNAL_EMAIL')
+            signal_password = os.getenv('SIGNAL_PASSWORD')
+            
+            # Debug: Check if credentials are loaded
+            yield f"data: {json.dumps({'type': 'log', 'message': f'📧 Email loaded: {bool(signal_email)}', 'level': 'info'})}\n\n"
+            yield f"data: {json.dumps({'type': 'log', 'message': f'🔑 Password loaded: {bool(signal_password)}', 'level': 'info'})}\n\n"
+            
+            if not signal_email or not signal_password:
+                yield f"data: {json.dumps({'type': 'error', 'message': '❌ SIGNAL_EMAIL or SIGNAL_PASSWORD not set in environment!'})}\n\n"
+                return
+            
             # Create a simple callback for logging
             def login_callback(msg_type, msg):
                 pass  # Silent callback for server mode
@@ -105,7 +117,7 @@ def process_vins():
                 yield f"data: {json.dumps({'type': 'log', 'message': f'🔐 Login attempt {attempt}...', 'level': 'info'})}\n\n"
                 
                 try:
-                    if automation.auto_login(os.getenv('SIGNAL_EMAIL'), os.getenv('SIGNAL_PASSWORD'), login_callback):
+                    if automation.auto_login(signal_email, signal_password, login_callback):
                         login_success = True
                         yield f"data: {json.dumps({'type': 'log', 'message': '✅ Login successful!', 'level': 'success'})}\n\n"
                 except Exception as e:
