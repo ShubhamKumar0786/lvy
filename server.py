@@ -5,10 +5,17 @@ import json
 import time
 import os
 import sys
+import subprocess
 import gc
 
 # Load environment variables from .env file
 load_dotenv()
+
+# Set playwright browser path
+os.environ['PLAYWRIGHT_BROWSERS_PATH'] = '/opt/render/.cache/ms-playwright'
+
+# Install Playwright browsers at startup (required for Render - build/runtime are separate)
+subprocess.run([sys.executable, "-m", "playwright", "install", "chromium"], check=False)
 
 # Get the directory where this script is located
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
