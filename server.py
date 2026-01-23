@@ -6,6 +6,7 @@ import time
 import os
 import sys
 import subprocess
+import gc
 
 # Load environment variables from .env file
 load_dotenv()
@@ -136,6 +137,20 @@ def process_vins():
             for i, item in enumerate(valid_rows):
                 if should_stop:
                     break
+                
+                # Restart browser every 3 VINs to free memory
+                if i > 0 and i % 3 == 0:
+                    yield f"data: {json.dumps({'type': 'log', 'message': '🔄 Restarting browser to free memory...', 'level': 'info'})}\n\n"
+                    try:
+                        automation.stop()
+                        gc.collect()  # Force garbage collection
+                        time.sleep(1)
+                        automation.start()
+                        # Re-login after restart
+                        automation.auto_login(signal_email, signal_password, login_callback)
+                        yield f"data: {json.dumps({'type': 'log', 'message': '✅ Browser restarted!', 'level': 'success'})}\n\n"
+                    except Exception as e:
+                        yield f"data: {json.dumps({'type': 'log', 'message': f'⚠️ Restart error: {str(e)}', 'level': 'warning'})}\n\n"
                 
                 vin = item['vin']
                 progress = (i + 1) / total
